@@ -1,0 +1,37 @@
+{% extends "v_layout.twig" %}
+{% block contenu %}
+<form method="post" action="{{path("produit.validFormEdit")}}">
+	<div class="row">
+		<fieldset>
+			<legend>Edit un produit</legend>
+			<input name="id" type="hidden" value="{{donnees.id}}" /> <label>Nom
+				: <input name="nom" type="text" size="18"
+				value="{{donnees.nom | default('')}}" /> {% if erreurs.nom is defined %}
+				<small class="error">{{erreurs.nom}}</small> {% endif %}
+			</label> <label>Type : <select name="typeProduit_id">
+					{% if  donnees.typeProduit_id is not defined or donnees.typeProduit_id is empty   %}
+					<option value="">Veuillez sélectionner un produit</option>
+					{% endif %}
+					{% for typeProduit in typeProduits %}
+					<option value="{{ typeProduit.id }}"
+						{% if donnees.typeProduit_id is defined and typeProduit.id == donnees.typeProduit_id %}
+						selected {% endif %}>
+						{{ typeProduit.libelle }}
+					</option>
+					{% endfor %}
+			</select> {% if erreurs.typeProduit_id is defined %} <small class="error">{{erreurs.typeProduit_id}}</small>
+				{% endif %}
+			</label><label>prix : <input name="prix" type="text" size="18"
+				value="{{donnees.prix | default('')}}" /> {% if erreurs.prix is defined %}
+				<small class="error">{{erreurs.prix}}</small> {% endif %}
+			</label> <label>photo : <input name="photo" type="text" size="18"
+				value="{{donnees.photo | default('')}}" /> {% if erreurs.photo is defined %}
+				<small class="error">{{erreurs.photo}}</small> {% endif %}
+			</label><input type="submit" name="EditProduit" value="Edit" />
+
+		</fieldset>
+	</div>
+</form>
+{% endblock %}
+
+

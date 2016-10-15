@@ -1,0 +1,28 @@
+
+
+<nav class="top-bar" data-topbar role="navigation">
+	<ul class="title-area">
+		<li class="name">
+			<h1>
+				<a href="">Sujet 3</a>
+			</h1>
+		</li>
+		<li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a>
+		</li>
+	</ul>
+	<section class="top-bar-section">
+		<ul class="left">
+			<li class="divider"></li>
+			<li class="has-dropdown"><a href="#">Transactions</a>
+				<ul class="dropdown">
+					<li><a href="{{ path('operation.add') }}"> créer une transaction
+					</a></li>
+					<li><a href="{{ path('operation.show') }}">afficher/editer/supprimer
+							les transactions</a></li>
+				</ul></li>
+		</ul>
+		<ul class="right">
+			<li><a href="#">se deconnecter</a></li>
+		</ul>
+	</section>
+</nav>
