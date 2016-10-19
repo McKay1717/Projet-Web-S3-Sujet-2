@@ -32,4 +32,15 @@ class OperationModel {
 		$qb->setParameter ( 'id', $id );
 		return $qb->execute ();
 	}
+	public function getOperation($id) {
+		$queryBuilder = new QueryBuilder ( $this->db );
+		$queryBuilder->select ( 'o.id_operation', 'o.date_effet', 'o.montant', 'o.type', 'o.id_libelle_operation' )->from ( 'operation', 'o' )->where ( "o.id_operation = :id" );
+		$queryBuilder->setParameter ( "id", $id );
+		return $queryBuilder->execute ()->fetchAll () [0];
+	}
+	public function editOperation($donnees) {
+		$queryBuilder = new QueryBuilder ( $this->db );
+		$queryBuilder->update ( 'operation' )->set ( 'date_effet', ':date_effet' )->set ( 'montant', ':montant' )->set ( 'type', ':type' )->set ( 'id_libelle_operation', ':id_libelle_operation' )->where ( "id_operation = :id" )->setParameter ( 'date_effet', $donnees ['date_effet'] )->setParameter ( 'montant', $donnees ['montant'] )->setParameter ( 'type', $donnees ['type'] )->setParameter ( "id", $donnees ["id_operation"] )->setParameter ( "id_libelle_operation", $donnees ["id_libelle_operation"] );
+		return $queryBuilder->execute ();
+	}
 }
