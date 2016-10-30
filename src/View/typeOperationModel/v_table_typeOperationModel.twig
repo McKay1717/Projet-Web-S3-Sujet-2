@@ -1,0 +1,36 @@
+{% extends "v_layout.twig" %}
+{% block contenu %}
+
+<div class="row">
+
+	<table>
+		<caption>Recapitulatifs des transactions</caption>
+		<thead>
+			<tr>
+				<th>id</th>
+				<th>Nature</th>
+				<th>Type</th>
+				<th>Montant</th>
+				<th>Date d'effet</th>
+				<th>opération</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for op in data if data is not empty %}
+			<tr>
+				<td>{{op.id_operation}}</td>
+				<td>{{op.type}}</td>
+				<td>{{op.libelle_operation}}</td>
+				<td>{{op.montant}} €</td>
+				<td>{{op.date_effet}}</td>
+				<td><a
+					href="{{ path('operation.edit', {id: op.id_operation}) }}">modifier</a>
+					<a href="{{ path('operation.delete', {id: op.id_operation}) }}">supprimer</a>
+				</td>
+			</tr>
+			{% endfor %}
+		<tbody>
+	</table>
+	<a href="{{ path('operation.add') }}"> Saisir une transaction </a>
+</div>
+{% endblock %}
