@@ -1,16 +1,19 @@
 {% extends "v_layout.twig" %}
 {% block contenu %}
-<form method="post" action="{{ path("operation.validFormDelete") }}">
+<form method="post" action="{{ path("typeoperation.validFormDelete") }}">
 	<div class="row">
 
 		<fieldset>
 			<legend>
-				Confirmer la suppression de la tansaction n°
-				{{ donnees.id_operation }}
+				Confirmer le type n°
+				{{ donnees.id_type }}
 			</legend>
-			<input name="id" type="hidden" value="{{donnees.id_operation}}" /> <input
-				type="submit" name="supprimerOperation" value="Supprimer" />
+			<input name="id" type="hidden" value="{{donnees.id_type}}" /> <input
+				type="submit" name="supprimerTypeOperation" value="Supprimer" />
 		</fieldset>
 	</div>
 </form>
+{% if donnees.error is defined %}
+<small class="error"> Des transactions de ce type existe encore</small>
+{% endif %}
 {% endblock %}

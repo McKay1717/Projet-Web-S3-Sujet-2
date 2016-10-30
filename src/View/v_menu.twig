@@ -15,14 +15,29 @@
 			<li class="divider"></li>
 			<li class="has-dropdown"><a href="#">Transactions</a>
 				<ul class="dropdown">
-					<li><a href="{{ path('operation.add') }}"> créer une transaction
-					</a></li>
-					<li><a href="{{ path('operation.show') }}">afficher/editer/supprimer
-							les transactions</a></li>
+					{% if is_granted('ROLE_ADMIN') %}
+					<li><a href="{{ path('operation.add') }}"> créer une
+							transaction </a></li>
+					{% endif %}
+					<li><a href="{{ path('operation.show') }}">afficher les
+							transactions</a></li>
 				</ul></li>
+			{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+			<li class="has-dropdown"><a href="#">Type de Transactions</a>
+				<ul class="dropdown">
+					{% if is_granted('ROLE_ADMIN') %}
+					<li><a href="{{ path('typeoperation.add') }}"> créer une
+							transaction </a></li>
+					{% endif %}
+					<li><a href="{{ path('typeoperation.show') }}">afficher
+							les types</a></li>
+				</ul></li>
+			{% endif %}
 		</ul>
 		<ul class="right">
-			<li><a href="#">se deconnecter</a></li>
+			<li>{% if is_granted('IS_AUTHENTICATED_FULLY') %} <a
+				href="{{ path('logout') }}">Logout</a> {% else %} <a
+				href="{{ path('user.login') }}">Login</a> {% endif %}</li>
 		</ul>
 	</section>
 </nav>

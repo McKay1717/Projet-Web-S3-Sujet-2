@@ -4,33 +4,33 @@
 <div class="row">
 
 	<table>
-		<caption>Recapitulatifs des transactions</caption>
+		<caption>Recapitulatifs des types de transaction</caption>
 		<thead>
 			<tr>
 				<th>id</th>
-				<th>Nature</th>
 				<th>Type</th>
-				<th>Montant</th>
-				<th>Date d'effet</th>
+				{% if is_granted('ROLE_ADMIN') %}
 				<th>opération</th>
+				{% endif %}
 			</tr>
 		</thead>
 		<tbody>
 			{% for op in data if data is not empty %}
 			<tr>
-				<td>{{op.id_operation}}</td>
-				<td>{{op.type}}</td>
+				<td>{{op.id_type}}</td>
 				<td>{{op.libelle_operation}}</td>
-				<td>{{op.montant}} €</td>
-				<td>{{op.date_effet}}</td>
+				{% if is_granted('ROLE_ADMIN') %}
 				<td><a
-					href="{{ path('operation.edit', {id: op.id_operation}) }}">modifier</a>
-					<a href="{{ path('operation.delete', {id: op.id_operation}) }}">supprimer</a>
+					href="{{ path('typeoperation.edit', {id: op.id_type}) }}">modifier</a>
+					<a href="{{ path('typeoperation.delete', {id: op.id_type}) }}">supprimer</a>
 				</td>
+				{% endif %}
 			</tr>
 			{% endfor %}
 		<tbody>
 	</table>
-	<a href="{{ path('operation.add') }}"> Saisir une transaction </a>
+	{% if is_granted('ROLE_ADMIN') %}
+	<a href="{{ path('typeoperation.add') }}"> Saisir un type </a>
+	{% endif %}
 </div>
 {% endblock %}

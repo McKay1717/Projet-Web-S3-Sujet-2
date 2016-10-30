@@ -15,6 +15,7 @@ class OperationsController implements ControllerProviderInterface {
 		return $this->show ( $app ); // appel de la méthode show
 	}
 	public function show(Application $app) {
+		
 		$this->operationModel = new OperationModel ( $app );
 		$produits = $this->operationModel->getAllOperations ();
 		return $app ["twig"]->render ( 'operation/v_table_operation.twig', [ 
