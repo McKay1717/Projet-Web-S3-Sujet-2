@@ -58,6 +58,7 @@ $app->register ( new Silex\Provider\AssetServiceProvider (), array (
 ) );
 // par défaut les méthodes DELETE PUT ne sont pas prises en compte
 use Symfony\Component\HttpFoundation\Request;
+
 Request::enableHttpMethodParameterOverride ();
 
 include 'routing.php';

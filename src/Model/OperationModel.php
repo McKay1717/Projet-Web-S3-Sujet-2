@@ -43,4 +43,10 @@ class OperationModel {
 		$queryBuilder->update ( 'operation' )->set ( 'date_effet', ':date_effet' )->set ( 'montant', ':montant' )->set ( 'type', ':type' )->set ( 'id_libelle_operation', ':id_libelle_operation' )->where ( "id_operation = :id" )->setParameter ( 'date_effet', $donnees ['date_effet'] )->setParameter ( 'montant', $donnees ['montant'] )->setParameter ( 'type', $donnees ['type'] )->setParameter ( "id", $donnees ["id_operation"] )->setParameter ( "id_libelle_operation", $donnees ["id_libelle_operation"] );
 		return $queryBuilder->execute ();
 	}
+	public function CountOperationByType($id_type) {
+		$queryBuilder = new QueryBuilder ( $this->db );
+		$queryBuilder->select ( 'COUNT(id_libelle_operation)' )->from ( 'operation')->where ( "id_libelle_operation = :id" );
+		$queryBuilder->setParameter ( "id", $id_type );
+		return $queryBuilder->execute ()->fetchColumn(0);
+	}
 }

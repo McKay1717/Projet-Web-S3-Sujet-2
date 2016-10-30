@@ -1,0 +1,16 @@
+{% extends "v_layout.twig" %}
+{% block contenu %}
+<form method="post" action="{{ path("operation.validFormDelete") }}">
+	<div class="row">
+
+		<fieldset>
+			<legend>
+				Confirmer la suppression de la tansaction n°
+				{{ donnees.id_operation }}
+			</legend>
+			<input name="id" type="hidden" value="{{donnees.id_operation}}" /> <input
+				type="submit" name="supprimerOperation" value="Supprimer" />
+		</fieldset>
+	</div>
+</form>
+{% endblock %}
