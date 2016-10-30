@@ -6,6 +6,7 @@
         "twig/twig": "^1.26",
         "symfony/twig-bridge": "^3.1",
         "symfony/asset": "^3.1",
-        "silex/web-profiler": "^2.0"
+        "silex/web-profiler": "^2.0",
+        "symfony/security": "^3.1"
     }
 }

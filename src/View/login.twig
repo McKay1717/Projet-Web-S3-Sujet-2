@@ -1,0 +1,36 @@
+{% extends "v_layout.twig" %}
+{% block contenu %}
+{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+<p>
+	Bienvenue
+	{{ app.security.token.user.username }}
+	!
+</p>
+<p>
+	<a href="{{ path('logout') }}">Déconnexion</a>
+</p>
+{% else %}
+<form action="{{ path('login_check') }}" method="post">
+	<fieldset>
+		<p>
+			<label for="username">Nom d'utilisateur : </label><input
+				id="username" type="text" name="_username"
+				value="{{last_username |default("")}}">
+		</p>
+		<p>
+			<label for="password">Mot de passe : </label><input id="password"
+				type="password" name="_password">
+		</p>
+		<p>
+			<input type="submit" value="Connexion">
+		</p>
+	</fieldset>
+	{% if error  is defined %}
+	<div class="error">
+		{{ error }}
+	</div>
+	{% endif %}
+</form>
+{% endif %}
+
+{% endblock %}

@@ -32,14 +32,6 @@ $app->register ( new Silex\Provider\DoctrineServiceProvider (), array (
 				'charset' => 'utf8mb4' 
 		) 
 ) );
-// utilisation de twig
-$app->register ( new Silex\Provider\TwigServiceProvider (), array (
-		'twig.path' => join ( DIRECTORY_SEPARATOR, [ 
-				dirname ( __DIR__ ),
-				'src',
-				'View' 
-		] ) 
-) );
 
 // utilisation des sessions
 $app->register ( new Silex\Provider\SessionServiceProvider () );
@@ -62,5 +54,68 @@ use Symfony\Component\HttpFoundation\Request;
 Request::enableHttpMethodParameterOverride ();
 
 include 'routing.php';
-// On lance l'application
+
+use App\Provider\UseProvider;
+// Ajout des régles de sécurité
+$app->register ( new Silex\Provider\SecurityServiceProvider (), array (
+		'security.firewalls' => array (
+				'login_path' => array (
+						'pattern' => '^/user/login$',
+						'anonymous' => true 
+				),
+				'default' => array (
+						'pattern' => '^/.*$',
+						'anonymous' => true,
+						'form' => array (
+								'login_path' => '/user/login',
+								'check_path' => 'login_check' 
+						),
+						'logout' => array (
+								'logout_path' => '/logout',
+								'invalidate_session' => false 
+						),
+						'users' => function ($app) {
+							return new App\Provider\UseProvider ( $app ['db'] );
+						} 
+				) 
+		),
+		'security.access_rules' => array (
+				array (
+						'^/user/login$',
+						'IS_AUTHENTICATED_ANONYMOUSLY' 
+				),
+				array (
+						'^/*show$',
+						'IS_AUTHENTICATED_ANONYMOUSLY' 
+				),
+				array (
+						'^/*add*$',
+						'ROLE_ADMIN' 
+				),
+				array (
+						'^/*edit*$',
+						'ROLE_ADMIN' 
+				),
+				array (
+						'^/*delete*$',
+						'ROLE_ADMIN' 
+				),
+				array (
+						'^/.+$',
+						'ROLE_USER' 
+				) 
+		) 
+) );
+// Initilisation des services
+$app->boot ();
+// On ajoute Twig après pour qu'il detect les rélges de secu
+// utilisation de twig
+$app->register ( new Silex\Provider\TwigServiceProvider (), array (
+		'twig.path' => join ( DIRECTORY_SEPARATOR, [ 
+				dirname ( __DIR__ ),
+				'src',
+				'View' 
+		] ) 
+) );
+
 $app->run ();

@@ -6,6 +6,7 @@ use Silex\Application;
 use Silex\Api\ControllerProviderInterface;
 use App\Model\TypeOperationModel;
 use Symfony\Component\HttpFoundation\Response;
+use App\Model\OperationModel;
 
 class TypeOperationsController implements ControllerProviderInterface {
 	private $typeOperationModel;
@@ -14,7 +15,7 @@ class TypeOperationsController implements ControllerProviderInterface {
 	}
 	public function show(Application $app) {
 		$this->typeOperationModel = new TypeOperationModel ( $app );
-		$produits = $this->typeOperationModel->getAllOperations ();
+		$produits = $this->typeOperationModel->getAllTypeOperations ();
 		return $app ["twig"]->render ( 'typeOperationModel/v_table_typeOperationModel.twig', [ 
 				'data' => $produits 
 		] );
@@ -38,17 +39,14 @@ class TypeOperationsController implements ControllerProviderInterface {
 		return $controllers;
 	}
 	public function validFormAdd(Application $app) {
-		if (isset ( $_POST ['libelle_operation'] ) && isset ( $_POST ['id_type'] )) {
+		if (isset ( $_POST ['libelle_operation'] )) {
 			$donnees = [ 
 					'libelle_operation' => htmlspecialchars ( $_POST ['libelle_operation'] ),
 					'id_type' => htmlspecialchars ( $_POST ['id_type'] ) 
 			];
 			if ((! preg_match ( "/^[A-Za-z ]{2,}/", $donnees ['libelle_operation'] )))
 				$erreurs ['libelle_operation'] = 'nom composé de 2 lettres minimum';
-			if (! is_numeric ( $donnees ['id_type'] ))
-				$erreurs ['id_type'] = 'veuillez saisir une valeur';
-			if (! is_numeric ( $donnees ['montant'] ))
-				$erreurs ['montant'] = 'saisir une valeur numérique';
+			;
 			
 			if (! empty ( $erreurs )) {
 				return $app ["twig"]->render ( 'typeOperationModel/v_form_create_typeOperationModel.twig', [ 
@@ -70,9 +68,22 @@ class TypeOperationsController implements ControllerProviderInterface {
 		$id = intval ( $_POST ['id'] );
 		
 		$this->typeOperationModel = new TypeOperationModel ( $app );
+	
+		$tmp = new OperationModel($app);
 		
-		$this->typeOperationModel->deleteOperationType ( $id );
-		return $app->redirect ( $app ["url_generator"]->generate ( "typeoperation.index" ) );
+		if ( $tmp->CountOperationByType($id) == 0) {
+			$this->typeOperationModel->deleteOperationType ( $id );
+			return $app->redirect ( $app ["url_generator"]->generate ( "typeoperation.index" ) );
+		} else {
+			$data = array (
+					'id_type' => $id,
+					'error' => '' 
+			);
+			
+			return $app ["twig"]->render ( 'typeOperationModel/v_form_delete_typeOperationModel.twig', [ 
+					'donnees' => $data 
+			] );
+		}
 	}
 	public function delete(Application $app, $id) {
 		$this->typeOperationModel = new TypeOperationModel ( $app );
@@ -112,14 +123,15 @@ class TypeOperationsController implements ControllerProviderInterface {
 				return $app->redirect ( $app ["url_generator"]->generate ( "typeoperation.index" ) );
 			}
 		} else {
-			return new Response ( 'Error', 400 /* ignored */, array (
+			return new Response ( 'Error 2', 400 /* ignored */, array (
 					'X-Status-Code' => 400 
 			) );
 		}
 	}
 	public function edit(Application $app, $id) {
+		$this->typeOperationModel = new TypeOperationModel ( $app );
 		$donnees = $this->typeOperationModel->getOperationType ( $id );
-		return $app ["twig"]->render ( 'typeOperationModel/v_form_edit_$typeOperationModel.twig', [ 
+		return $app ["twig"]->render ( 'typeOperationModel/v_form_edit_typeOperationModel.twig', [ 
 				'donnees' => $donnees 
 		] );
 	}

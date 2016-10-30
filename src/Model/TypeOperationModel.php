@@ -4,6 +4,7 @@ namespace App\Model;
 
 use Silex\Application;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Silex\ExceptionHandler;
 
 class TypeOperationModel {
 	private $db;
@@ -17,8 +18,8 @@ class TypeOperationModel {
 	}
 	public function insertOperationType($data) {
 		$queryBuilder = new QueryBuilder ( $this->db );
-		$queryBuilder->insert ( 'type_operation' )->values ( [
-				'libelle_operation' => '?'
+		$queryBuilder->insert ( 'type_operation' )->values ( [ 
+				'libelle_operation' => '?' 
 		] )->setParameter ( 0, $data ['libelle_operation'] );
 		return $queryBuilder->execute ();
 	}
@@ -27,7 +28,7 @@ class TypeOperationModel {
 		$qb->delete ( 'type_operation' );
 		$qb->where ( 'id_type = :id' );
 		$qb->setParameter ( 'id', $id );
-		return $qb->execute ();
+		$qb->execute ();
 	}
 	public function getOperationType($id) {
 		$queryBuilder = new QueryBuilder ( $this->db );

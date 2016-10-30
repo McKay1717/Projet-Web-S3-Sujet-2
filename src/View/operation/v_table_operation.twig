@@ -12,7 +12,9 @@
 				<th>Type</th>
 				<th>Montant</th>
 				<th>Date d'effet</th>
+				{% if is_granted('IS_ADMIN') %}
 				<th>opération</th>
+				{% endif %}
 			</tr>
 		</thead>
 		<tbody>
@@ -23,14 +25,18 @@
 				<td>{{op.libelle_operation}}</td>
 				<td>{{op.montant}} €</td>
 				<td>{{op.date_effet}}</td>
+				{% if is_granted('ROLE_ADMIN') %}
 				<td><a
 					href="{{ path('operation.edit', {id: op.id_operation}) }}">modifier</a>
 					<a href="{{ path('operation.delete', {id: op.id_operation}) }}">supprimer</a>
 				</td>
+				{% endif %}
 			</tr>
 			{% endfor %}
 		<tbody>
 	</table>
+	{% if is_granted('ROLE_ADMIN') %}
 	<a href="{{ path('operation.add') }}"> Saisir une transaction </a>
+	{% endif %}
 </div>
 {% endblock %}

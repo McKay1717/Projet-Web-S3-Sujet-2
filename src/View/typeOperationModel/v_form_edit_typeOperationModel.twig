@@ -1,34 +1,15 @@
 {% extends "v_layout.twig" %}
 {% block contenu %}
-<form method="post" action="{{ path("operation.validFormEdit") }} ">
+<form method="post" action="{{ path("typeoperation.validFormEdit") }} ">
 	<div class="row">
 		<fieldset>
 			<legend>Creer une transaction</legend>
-			<label>Nature : <input name="type" type="text" size="18"
-				value="{{donnees.type|default("")}}" /> {% if erreurs.type is defined %}
-				<small class="error">{{erreurs.type}}</small> {% endif %}
-			</label> <input name="id_operation" type="hidden"
-				value="{{donnees.id_operation}}" /> <label>Type : <select
-				name="id_libelle_operation">
-					{% if  donnees.id_libelle_operation is not defined or donnees.id_libelle_operation is empty   %}
-					<option value="">Veuillez sélectionner un type</option>
-					{% endif %}
-					{% for  type_operation in  type_operations %}
-					<option value="{{ type_operation.id_type }}"
-						{% if donnees.id_libelle_operation is defined and  type_operation.id_type == donnees.id_libelle_operation %}
-						selected {% endif %}>
-						{{ type_operation.libelle_operation  }}
-					</option>
-					{% endfor %}
-			</select> {% if erreurs.id_libelle_operation is defined %} <small
-				class="error">{{erreurs.id_libelle_operation}}</small> {% endif %}
-			</label> <label>Montant <input name="montant" type="text" size="18"
-				value="{{donnees.montant|default("")}}" /> {% if erreurs.montant is defined %}
-				<small class="error">{{erreurs.montant}}</small> {% endif %}
-			</label> <label>Date d'éffet <input name="date_effet" type="text"
-				size="18" value="{{donnees.date_effet|default("")}}" /> {% if erreurs.date_effet is defined %}
-				<small class="error">{{erreurs.date_effet}}</small> {% endif %}
-			</label> <input type="submit" name="creerOperation" value="créer" />
+			<label>Nature : <input name="libelle_operation" type="text"
+				size="18" value="{{donnees.libelle_operation|default("")}}" /> {% if erreurs.libelle_operation is defined %}
+				<small class="error">{{erreurs.libelle_operation}}</small> {% endif %}
+			</label> <input name="id_type" type="hidden"
+				value="{{donnees.id_type}}" /> <input type="submit"
+				name="editTypeOperation" value="Editer" />
 		</fieldset>
 	</div>
 </form>
