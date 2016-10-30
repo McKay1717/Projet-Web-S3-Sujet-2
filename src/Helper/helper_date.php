@@ -11,7 +11,7 @@ class OperationsController {
 	}
 	public function validate($date) {
 		$parse = date_parse ( $date );
-		if ($parse != FALSE) {
+		if ($parse != FALSE && $parse ['error_count'] == 0) {
 			return checkdate ( $parse ['month'], $parse ['day'], $parse ['year'] );
 		} else
 			return false;
