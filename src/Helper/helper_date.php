@@ -2,18 +2,24 @@
 
 namespace App\Helper;
 
-class OperationsController {
+class helper_date {
+	public function formatForDb($date) {
+		if (strpos ( $date, '/' ))
+			$date = $this->date_fr_to_us ( $date );
+		return $date;
+	}
 	public function date_us_to_fr($date) {
-		return date ( "%j/%m/%Y", strtotime ( $date ) );
+		$date = explode("-", $date);
+		$newsdate=$date[2].'/'.$date[1].'/'.$date[0];
+		return $newsdate;
 	}
 	public function date_fr_to_us($date) {
-		return date ( "%Y-%m-%j", strtotime ( $date ) );
+		$date = explode("/", $date);
+		$newsdate=$date[2].'-'.$date[1].'-'.$date[0];
+		return $newsdate;
 	}
-	public function validate($date) {
-		$parse = date_parse ( $date );
-		if ($parse != FALSE && $parse ['error_count'] == 0) {
-			return checkdate ( $parse ['month'], $parse ['day'], $parse ['year'] );
-		} else
-			return false;
+	function validateDate($date) {
+		$date = $this->formatForDb($date);
+		return ! ( bool ) strtotime ( $date ) && $date != "1970-01-01";
 	}
 }

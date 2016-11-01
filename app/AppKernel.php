@@ -85,25 +85,19 @@ $app->register ( new Silex\Provider\SecurityServiceProvider (), array (
 						'IS_AUTHENTICATED_ANONYMOUSLY' 
 				),
 				array (
-						'^/*show$',
+						'^\/($|show$)',
 						'IS_AUTHENTICATED_ANONYMOUSLY' 
 				),
 				array (
-						'^/*add*$',
-						'ROLE_ADMIN' 
+						'^(\/){0,1}(type){0,1}(\/){0,1}(show){0,1}$',
+						'ROLE_USER'
 				),
 				array (
-						'^/*edit*$',
+						'\/(|type)(|\/)*(add|edit|delete)*(|\/)(|\d+)',
 						'ROLE_ADMIN' 
-				),
-				array (
-						'^/*delete*$',
-						'ROLE_ADMIN' 
-				),
-				array (
-						'^/.+$',
-						'ROLE_USER' 
-				) 
+				)
+
+
 		) 
 ) );
 // Initilisation des services
