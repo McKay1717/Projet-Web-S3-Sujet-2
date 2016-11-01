@@ -8,6 +8,7 @@ use App\Model\OperationModel;
 use App\Model\TypeOperationModel;
 use Symfony\Component\HttpFoundation\Response;
 use App\Helper\helper_date;
+use Symfony\Component\Security\Csrf\CsrfToken;
 
 class OperationsController implements ControllerProviderInterface {
 	private $operationModel;
@@ -22,7 +23,7 @@ class OperationsController implements ControllerProviderInterface {
 		$produits = $this->operationModel->getAllOperations ();
 		foreach ( $produits as $key => $value )
 			
-			$produits[$key] ['date_effet'] = $this->dateHelper->date_us_to_fr ( $value ['date_effet'] );
+			$produits [$key] ['date_effet'] = $this->dateHelper->date_us_to_fr ( $value ['date_effet'] );
 		
 		return $app ["twig"]->render ( 'operation/v_table_operation.twig', [ 
 				'data' => $produits 
@@ -48,20 +49,27 @@ class OperationsController implements ControllerProviderInterface {
 	}
 	public function validFormAdd(Application $app) {
 		$this->dateHelper = new helper_date ();
+		
 		if (isset ( $_POST ['type'] ) && isset ( $_POST ['id_libelle_operation'] ) and isset ( $_POST ['montant'] ) and isset ( $_POST ['date_effet'] )) {
 			$donnees = [ 
 					'type' => htmlspecialchars ( $_POST ['type'] ),
 					'id_libelle_operation' => htmlspecialchars ( $_POST ['id_libelle_operation'] ),
 					'montant' => htmlspecialchars ( $_POST ['montant'] ),
-					'date_effet' => htmlspecialchars ( $_POST ['date_effet'] )
+					'date_effet' => htmlspecialchars ( $_POST ['date_effet'] ),
+					'_csrf_token' => htmlspecialchars ( $_POST ['_csrf_token'] ) 
 			];
+			if (! $app ['csrf.token_manager']->isTokenValid ( new CsrfToken ( 'addOp', $donnees ['_csrf_token'] ) )) {
+				return new Response ( 'Error', 401 /* ignored */, array (
+						'X-Status-Code' => 401 
+				) );
+			}
 			if ((! preg_match ( "/^[A-Za-z ]{2,}/", $donnees ['type'] )))
 				$erreurs ['type'] = 'nom composé de 2 lettres minimum';
 			if (! is_numeric ( $donnees ['id_libelle_operation'] ))
 				$erreurs ['id_libelle_operation'] = 'veuillez saisir une valeur';
 			if (! is_numeric ( $donnees ['montant'] ))
 				$erreurs ['montant'] = 'saisir une valeur numérique';
-			if ($this->dateHelper->validateDate($donnees ['date_effet'] ))
+			if ($this->dateHelper->validateDate ( $donnees ['date_effet'] ))
 				$erreurs ['date_effet'] = 'Date incorrect';
 			
 			if (! empty ( $erreurs )) {
@@ -74,7 +82,7 @@ class OperationsController implements ControllerProviderInterface {
 				] );
 			} else {
 				$this->operationModel = new OperationModel ( $app );
-				$donnees ['date_effet'] = $this->dateHelper->formatForDb($donnees ['date_effet']);
+				$donnees ['date_effet'] = $this->dateHelper->formatForDb ( $donnees ['date_effet'] );
 				$this->operationModel->insertOperation ( $donnees );
 				return $app->redirect ( $app ["url_generator"]->generate ( "operation.index" ) );
 			}
@@ -82,24 +90,34 @@ class OperationsController implements ControllerProviderInterface {
 			return "error ????? PB data form";
 	}
 	public function add(Application $app) {
+		$csrf = $app ['csrf.token_manager']->getToken ( 'addOp' );
 		$this->typeOperationModel = new TypeOperationModel ( $app );
 		$type_operations = $this->typeOperationModel->getAllTypeOperations ();
 		return $app ["twig"]->render ( 'operation/v_form_create_operation.twig', [ 
-				'type_operations' => $type_operations 
+				'type_operations' => $type_operations,
+				'csrf' => $csrf 
 		] );
 	}
 	public function validFormDelete(Application $app) {
 		$id = intval ( $_POST ['id'] );
+		$_csrf_token = htmlspecialchars ( $_POST ['_csrf_token'] );
+		if (! $app ['csrf.token_manager']->isTokenValid ( new CsrfToken ( 'delOp', $_csrf_token ) )) {
+			return new Response ( 'Error', 401 /* ignored */, array (
+					'X-Status-Code' => 401 
+			) );
+		}
 		
 		$this->operationModel = new OperationModel ( $app );
 		
 		$this->operationModel->deleteOperation ( $id );
+		
 		return $app->redirect ( $app ["url_generator"]->generate ( "operation.index" ) );
 	}
 	public function delete(Application $app, $id) {
 		$this->operationModel = new OperationModel ( $app );
 		$data = array (
-				'id_operation' => $id 
+				'id_operation' => $id,
+				'_csrf_token' => $app ['csrf.token_manager']->getToken ( 'delOp' ) 
 		);
 		return $app ["twig"]->render ( 'operation/v_form_delete_operation.twig', [ 
 				'donnees' => $data 
@@ -113,8 +131,14 @@ class OperationsController implements ControllerProviderInterface {
 					'id_libelle_operation' => htmlspecialchars ( $_POST ['id_libelle_operation'] ),
 					'montant' => htmlspecialchars ( $_POST ['montant'] ),
 					'date_effet' => htmlspecialchars ( $_POST ['date_effet'] ),
-					'id_operation' => htmlspecialchars ( $_POST ['id_operation'] ) 
+					'id_operation' => htmlspecialchars ( $_POST ['id_operation'] ),
+					'_csrf_token' => htmlspecialchars ( $_POST ['_csrf_token'] ) 
 			];
+			if (! $app ['csrf.token_manager']->isTokenValid ( new CsrfToken ( 'editOp', $donnees ['_csrf_token'] ) )) {
+				return new Response ( 'Error', 401 /* ignored */, array (
+						'X-Status-Code' => 401 
+				) );
+			}
 			if (! is_numeric ( $donnees ['id_operation'] )) {
 				return new Response ( 'Error', 400 /* ignored */, array (
 						'X-Status-Code' => 400 
@@ -128,8 +152,7 @@ class OperationsController implements ControllerProviderInterface {
 			if (! is_numeric ( $donnees ['montant'] ))
 				$erreurs ['montant'] = 'saisir une valeur numérique';
 			
-		
-			if ($this->dateHelper->validateDate($donnees['date_effet']))
+			if ($this->dateHelper->validateDate ( $donnees ['date_effet'] ))
 				$erreurs ['date_effet'] = 'Date incorrect';
 			
 			if (! empty ( $erreurs )) {
@@ -142,7 +165,7 @@ class OperationsController implements ControllerProviderInterface {
 				] );
 			} else {
 				$this->operationModel = new OperationModel ( $app );
-				$donnees ['date_effet'] = $this->dateHelper->formatForDb($donnees ['date_effet']);
+				$donnees ['date_effet'] = $this->dateHelper->formatForDb ( $donnees ['date_effet'] );
 				$this->operationModel->editOperation ( $donnees );
 				return $app->redirect ( $app ["url_generator"]->generate ( "operation.index" ) );
 			}
@@ -157,8 +180,10 @@ class OperationsController implements ControllerProviderInterface {
 		$this->typeOperationModel = new TypeOperationModel ( $app );
 		$type_operations = $this->typeOperationModel->getAllTypeOperations ();
 		$this->operationModel = new OperationModel ( $app );
+		
 		$donnees = $this->operationModel->getOperation ( $id );
-		$donnees ['date_effet'] = $this->dateHelper->date_us_to_fr($donnees ['date_effet']);
+		$donnees ['date_effet'] = $this->dateHelper->date_us_to_fr ( $donnees ['date_effet'] );
+		$donnees ['_csrf_token'] = $app ['csrf.token_manager']->getToken ( 'editOp' );
 		return $app ["twig"]->render ( 'operation/v_form_edit_operation.twig', [ 
 				'type_operations' => $type_operations,
 				'donnees' => $donnees 

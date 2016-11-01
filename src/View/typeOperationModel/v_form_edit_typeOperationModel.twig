@@ -3,13 +3,14 @@
 <form method="post" action="{{ path("typeoperation.validFormEdit") }} ">
 	<div class="row">
 		<fieldset>
+			<input type="hidden" name="_csrf_token"
+				value="{{ donnees._csrf_token }}">
 			<legend>Creer une transaction</legend>
 			<label>Nature : <input name="libelle_operation" type="text"
 				size="18" value="{{donnees.libelle_operation|default("")}}" /> {% if erreurs.libelle_operation is defined %}
 				<small class="error">{{erreurs.libelle_operation}}</small> {% endif %}
-			</label> <input name="id_type" type="hidden"
-				value="{{donnees.id_type}}" /> <input type="submit"
-				name="editTypeOperation" value="Editer" />
+			</label> <input name="id_type" type="hidden" value="{{donnees.id_type}}" />
+			<input type="submit" name="editTypeOperation" value="Editer" />
 		</fieldset>
 	</div>
 </form>

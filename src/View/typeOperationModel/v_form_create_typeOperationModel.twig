@@ -1,18 +1,20 @@
 {% extends "v_layout.twig" %}
 {% block contenu %}
-    <form method="post" action="{{ path("typeoperation.validFormAdd") }} ">
-        <div class="row">
-            <fieldset>
-                <legend>Creer une transaction</legend>
-                <label>Libelle :
-                    <input name="libelle_operation"  type="text"  size="18" value="{{donnees.libelle_operation|default("")}}" />
-                    {% if erreurs.libelle_operation is defined %}
-                        <small class="error">{{erreurs.libelle_operation}}</small>
-                    {% endif %}
-                </label>
-
-                <input type="submit" name="creerTypeOperation" value="créer" />
-            </fieldset>
-        </div>
-    </form>
+<form method="post" action="{{ path("typeoperation.validFormAdd") }} ">
+	<div class="row">
+		<fieldset>
+			{% if  donnees._csrf_token is not defined  %}
+			<input type="hidden" name="_csrf_token" value="{{ csrf }}">
+			{% else %}
+			<input type="hidden" name="_csrf_token"
+				value="{{ donnees._csrf_token }}">
+			{% endif %}
+			<legend>Creer une transaction</legend>
+			<label>Libelle : <input name="libelle_operation" type="text"
+				size="18" value="{{donnees.libelle_operation|default("")}}" /> {% if erreurs.libelle_operation is defined %}
+				<small class="error">{{erreurs.libelle_operation}}</small> {% endif %}
+			</label> <input type="submit" name="creerTypeOperation" value="créer" />
+		</fieldset>
+	</div>
+</form>
 {% endblock %}

@@ -7,6 +7,7 @@ use Silex\Api\ControllerProviderInterface;
 use App\Model\TypeOperationModel;
 use Symfony\Component\HttpFoundation\Response;
 use App\Model\OperationModel;
+use Symfony\Component\Security\Csrf\CsrfToken;
 
 class TypeOperationsController implements ControllerProviderInterface {
 	private $typeOperationModel;
@@ -42,8 +43,14 @@ class TypeOperationsController implements ControllerProviderInterface {
 		if (isset ( $_POST ['libelle_operation'] )) {
 			$donnees = [ 
 					'libelle_operation' => htmlspecialchars ( $_POST ['libelle_operation'] ),
-					'id_type' => htmlspecialchars ( $_POST ['id_type'] ) 
+					'id_type' => htmlspecialchars ( $_POST ['id_type'] ),
+					'_csrf_token' => htmlspecialchars ( $_POST ['_csrf_token'] ) 
 			];
+			if (! $app ['csrf.token_manager']->isTokenValid ( new CsrfToken ( 'addType', $donnees ['_csrf_token'] ) )) {
+				return new Response ( 'Error', 401 /* ignored */, array (
+						'X-Status-Code' => 401 
+				) );
+			}
 			if ((! preg_match ( "/^[A-Za-z ]{2,}/", $donnees ['libelle_operation'] )))
 				$erreurs ['libelle_operation'] = 'nom composé de 2 lettres minimum';
 			;
@@ -62,21 +69,30 @@ class TypeOperationsController implements ControllerProviderInterface {
 			return "error ????? PB data form";
 	}
 	public function add(Application $app) {
-		return $app ["twig"]->render ( 'typeOperationModel/v_form_create_typeOperationModel.twig' );
+		$csrf = $app ['csrf.token_manager']->getToken ( 'addType' );
+		return $app ["twig"]->render ( 'typeOperationModel/v_form_create_typeOperationModel.twig', [ 
+				'csrf' => $csrf 
+		] );
 	}
 	public function validFormDelete(Application $app) {
 		$id = intval ( $_POST ['id'] );
 		
 		$this->typeOperationModel = new TypeOperationModel ( $app );
-	
-		$tmp = new OperationModel($app);
+		$_csrf_token = htmlspecialchars ( $_POST ['_csrf_token'] );
+		if (! $app ['csrf.token_manager']->isTokenValid ( new CsrfToken ( 'delType', $_csrf_token ) )) {
+			return new Response ( 'Error', 401 /* ignored */, array (
+					'X-Status-Code' => 401
+			) );
+		}
+		$tmp = new OperationModel ( $app );
 		
-		if ( $tmp->CountOperationByType($id) == 0) {
+		if ($tmp->CountOperationByType ( $id ) == 0) {
 			$this->typeOperationModel->deleteOperationType ( $id );
 			return $app->redirect ( $app ["url_generator"]->generate ( "typeoperation.index" ) );
 		} else {
 			$data = array (
 					'id_type' => $id,
+					'_csrf_token' => $_csrf_token,
 					'error' => '' 
 			);
 			
@@ -88,7 +104,8 @@ class TypeOperationsController implements ControllerProviderInterface {
 	public function delete(Application $app, $id) {
 		$this->typeOperationModel = new TypeOperationModel ( $app );
 		$data = array (
-				'id_type' => $id 
+				'id_type' => $id ,
+				'_csrf_token' => $app ['csrf.token_manager']->getToken ( 'delType' )
 		);
 		return $app ["twig"]->render ( 'typeOperationModel/v_form_delete_typeOperationModel.twig', [ 
 				'donnees' => $data 
@@ -98,8 +115,14 @@ class TypeOperationsController implements ControllerProviderInterface {
 		if (isset ( $_POST ['id_type'] ) && isset ( $_POST ['libelle_operation'] )) {
 			$donnees = [ 
 					'libelle_operation' => htmlspecialchars ( $_POST ['libelle_operation'] ),
-					'id_type' => htmlspecialchars ( $_POST ['id_type'] ) 
+					'id_type' => htmlspecialchars ( $_POST ['id_type'] ),
+					'_csrf_token' => htmlspecialchars ( $_POST ['_csrf_token'] ) 
 			];
+			if (! $app ['csrf.token_manager']->isTokenValid ( new CsrfToken ( 'editType', $donnees ['_csrf_token'] ) )) {
+				return new Response ( 'Error', 401 /* ignored */, array (
+						'X-Status-Code' => 401 
+				) );
+			}
 			if (! is_numeric ( $donnees ['id_type'] )) {
 				return new Response ( 'Error', 400 /* ignored */, array (
 						'X-Status-Code' => 400 
@@ -131,6 +154,7 @@ class TypeOperationsController implements ControllerProviderInterface {
 	public function edit(Application $app, $id) {
 		$this->typeOperationModel = new TypeOperationModel ( $app );
 		$donnees = $this->typeOperationModel->getOperationType ( $id );
+		$donnees ['_csrf_token'] = $app ['csrf.token_manager']->getToken ( 'editType' );
 		return $app ["twig"]->render ( 'typeOperationModel/v_form_edit_typeOperationModel.twig', [ 
 				'donnees' => $donnees 
 		] );
