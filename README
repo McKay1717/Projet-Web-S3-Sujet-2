@@ -1,0 +1,6 @@
+OperationConroller => Object Symphony
+TypeOperationController => Standelone
+
+Les deux version cohabite pour vous permetre de l'évolution du projet et les différente façon que j'ai utilisé pour dev
+
+Pour installer vendor composer install
