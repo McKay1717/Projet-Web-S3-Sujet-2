@@ -106,6 +106,7 @@ class OperationsController implements ControllerProviderInterface {
 		] );
 	}
 	public function validFormEdit(Application $app) {
+		$this->dateHelper = new helper_date ();
 		if (isset ( $_POST ['id_operation'] ) && isset ( $_POST ['type'] ) && isset ( $_POST ['id_libelle_operation'] ) and isset ( $_POST ['montant'] ) and isset ( $_POST ['date_effet'] )) {
 			$donnees = [ 
 					'type' => htmlspecialchars ( $_POST ['type'] ),
@@ -127,8 +128,8 @@ class OperationsController implements ControllerProviderInterface {
 			if (! is_numeric ( $donnees ['montant'] ))
 				$erreurs ['montant'] = 'saisir une valeur numérique';
 			
-			list ( $y, $m, $d ) = explode ( '-', $donnees ['date_effet'] );
-			if (! checkdate ( $m, $d, $y ))
+		
+			if ($this->dateHelper->validateDate($donnees['date_effet']))
 				$erreurs ['date_effet'] = 'Date incorrect';
 			
 			if (! empty ( $erreurs )) {
@@ -141,6 +142,7 @@ class OperationsController implements ControllerProviderInterface {
 				] );
 			} else {
 				$this->operationModel = new OperationModel ( $app );
+				$donnees ['date_effet'] = $this->dateHelper->formatForDb($donnees ['date_effet']);
 				$this->operationModel->editOperation ( $donnees );
 				return $app->redirect ( $app ["url_generator"]->generate ( "operation.index" ) );
 			}
@@ -151,10 +153,12 @@ class OperationsController implements ControllerProviderInterface {
 		}
 	}
 	public function edit(Application $app, $id) {
+		$this->dateHelper = new helper_date ();
 		$this->typeOperationModel = new TypeOperationModel ( $app );
 		$type_operations = $this->typeOperationModel->getAllTypeOperations ();
 		$this->operationModel = new OperationModel ( $app );
 		$donnees = $this->operationModel->getOperation ( $id );
+		$donnees ['date_effet'] = $this->dateHelper->date_us_to_fr($donnees ['date_effet']);
 		return $app ["twig"]->render ( 'operation/v_form_edit_operation.twig', [ 
 				'type_operations' => $type_operations,
 				'donnees' => $donnees 
