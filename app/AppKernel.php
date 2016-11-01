@@ -39,6 +39,8 @@ $app->register ( new Silex\Provider\SessionServiceProvider () );
 // en dev, nous voulons voir les erreurs
 $app ['debug'] = true;
 // rajoute la méthode asset dans twig
+use Silex\Provider\CsrfServiceProvider;
+$app->register(new CsrfServiceProvider());
 
 $app->register ( new Silex\Provider\AssetServiceProvider (), array (
 		'assets.named_packages' => array (
@@ -93,13 +95,25 @@ $app->register ( new Silex\Provider\SecurityServiceProvider (), array (
 						'ROLE_USER'
 				),
 				array (
-						'\/(|type)(|\/)*(add|edit|delete)*(|\/)(|\d+)',
+						'^\/(|type)(|\/)(add|edit|delete|show){0,1}(|\/){0,1}(|\d+)$',
 						'ROLE_ADMIN' 
 				)
 
 
 		) 
 ) );
+//ADMIN herite des droit de user
+$app['security.role_hierarchy'] = array(
+		'ROLE_ADMIN' => array('ROLE_USER'),
+);
+use Silex\Provider\FormServiceProvider;
+
+$app->register(new FormServiceProvider());
+$app->register(new Silex\Provider\LocaleServiceProvider());
+$app->register(new Silex\Provider\TranslationServiceProvider(), array(
+		'locale_fallbacks' => array('fr'),
+));
+$app->register(new Silex\Provider\ValidatorServiceProvider());
 // Initilisation des services
 $app->boot ();
 // On ajoute Twig après pour qu'il detect les rélges de secu
