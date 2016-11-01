@@ -45,7 +45,7 @@ class OperationModel {
 	}
 	public function CountOperationByType($id_type) {
 		$queryBuilder = new QueryBuilder ( $this->db );
-		$queryBuilder->select ( 'COUNT(id_libelle_operation)' )->from ( 'operation')->where ( "id_libelle_operation = :id" );
+		$queryBuilder->select ( 'COUNT(id_libelle_operation)' )->from ( 'operation' )->where ( "id_libelle_operation = :id" );
 		$queryBuilder->setParameter ( "id", $id_type );
 		return $queryBuilder->execute ()->fetchColumn(0);
 	}
