@@ -22,7 +22,8 @@ class OperationModel {
 				'id_libelle_operation' => '?',
 				'montant' => '?',
 				'date_effet' => '?' 
-		] )->setParameter ( 0, $data ['type'] )->setParameter ( 1, $data ['id_libelle_operation'] )->setParameter ( 2, $data ['montant'] )->setParameter ( 3, $data ['date_effet'] );
+		] )// Edit for sympho ->setParameter ( 0, $data ['type'] )->setParameter ( 1, $data ['id_libelle_operation'] )->setParameter ( 2, $data ['montant'] )->setParameter ( 3, $data ['date_effet'] );
+		->setParameter ( 0, $data ['Nature'] )->setParameter ( 1, $data ['Type_operation'] )->setParameter ( 2, $data ['montant'] )->setParameter ( 3, $data ['Date'] );
 		return $queryBuilder->execute ();
 	}
 	public function deleteOperation($id) {

@@ -3,6 +3,8 @@
 <form method="post" action="{{ path("operation.validFormEdit") }} ">
 	<div class="row">
 		<fieldset>
+			<input type="hidden" name="_csrf_token"
+				value="{{ donnees._csrf_token }}">
 			<legend>Creer une transaction</legend>
 			<label>Nature : <input name="type" type="text" size="18"
 				value="{{donnees.type|default("")}}" /> {% if erreurs.type is defined %}
